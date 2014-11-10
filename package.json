@@ -1,0 +1,26 @@
+{
+  "name": "adts",
+  "version": "0.1.0",
+  "description": "Abstract Data Types in TypeScript",
+  "keywords": [
+    "abstract",
+    "data",
+    "types",
+    "typescript",
+    "ts"
+  ],
+  "homepage": "https://github.com/chbrown/adts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/chbrown/adts.git"
+  },
+  "bugs": {
+    "email": "Christopher Brown <io@henrian.com>",
+    "url": "http://github.com/chbrown/adts/issues"
+  },
+  "license": "MIT",
+  "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
+  "scripts": {
+    "prepublish": "make"
+  }
+}
