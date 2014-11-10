@@ -12,19 +12,19 @@ Concerns so far:
 
 ## TODO
 
-[ ] Container
-[ ] Deque
-[ ] Graph
-[ ] List
-[ ] Map
-[ ] Map/Associative array/Dictionary
-[ ] Multimap
-[.] Multiset (Bag)
-[ ] Priority queue
-[ ] Queue
-[X] Set
-[X] Stack
-[ ] Tree
+- Container
+- Deque
+- Graph
+- List
+- Map
+- Map/Associative array/Dictionary
+- Multimap
+- Multiset/Bag (**partially done**)
+- Priority queue
+- Queue
+- Set (**done**)
+- Stack (**done**)
+- Tree
 
 ... more?
 
