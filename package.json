@@ -20,6 +20,9 @@
   },
   "license": "MIT",
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
+  "devDependencies": {
+    "mocha": "*"
+  },
   "scripts": {
     "prepublish": "make"
   }
