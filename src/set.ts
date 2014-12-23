@@ -1,111 +1,230 @@
 module adts {
+  /** Compare two objects and return false as soon as we find a property
+   * not present in both. Otherwise return true. */
+  function keysEqual(a: {[index: string]: any}, b: {[index: string]: any}) {
+    for (var b_element in b) {
+      if (!(b_element in a)) {
+        return false;
+      }
+    }
+    for (var a_element in a) {
+      if (!(a_element in b)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+  new Set(...elements): an abstract data type supporting methods like .add(),
+  .merge(), .contains(), and .equals().
+
+  Set is implemented by an object with keys that represent elements in the set.
+  The values of the object are all boolean true's; the value does not matter,
+  only their presence does.
+  */
   export class Set {
-    /**
-     S = Set: a helper around an object with keys that represent elements in the set.
-     The values of the object are all true; they do not really matter.
-     This object is available at the private member `._element_object`.
-
-     S(), S([]), new S(), and new S([]) will all return the empty set.
-
-     */
     private _element_object: {[index: string]: boolean};
-    constructor(elements: Array<string> = []) {
+    /** Create a new Set from a plain old Array of strings */
+    constructor(elements: string[]) {
       this._element_object = {};
-      for (var i = 0, element; (element = elements[i]); i++) {
-        this._element_object[element] = true;
+      this._addArray(elements);
+    }
+    /** Clone this set, returning the copy.
+     * [immutable] */
+    clone() {
+      var copy = new Set([]);
+      for (var element in this._element_object) {
+        copy._element_object[element] = true;
       }
+      return copy;
     }
-    // handle overloading constructor without `new` keyword
-    //(elements: Array<string>): Set {
-    //  return new Set(elements);
-    //}
-    //if (!(this instanceof Set)) {
-    //  return new Set(elements);
-    //}
-    //if (elements instanceof Set) {
-    //  // creating a new S from another S will create a copy
-    //  elements = elements.toArray();
-    //}
-    _add(element: string) {
-      /** Mutable. */
-      this._element_object[element] = true;
-    }
-    add(element: string) {
-      /** Immutable. Returns a new set. */
-      var s = new Set([element]);
-      s._merge(this);
-      return s;
-    }
-    _merge(other_set: Set) {
-      /** Mutable. */
-      for (var element in other_set._element_object) {
-        this._element_object[element] = true;
-      }
-    }
-    _remove(element: string) {
-      /** Mutable. No-op if the element doesn't exist anyway. */
-      delete this._element_object[element];
-    }
-    equal(other_set: Set) {
-      /** Pairwise set comparison. Return false at the first mismatch.
-
-       S([1, 4, 9]).equal(S([9, 4, 1])) == true
-       S(['a', 'b', 'z']).equal(S(['a', 'b'])) == false
-
-       TODO: avoid overlapping comparisons?
-       */
-      for (var other_element in other_set._element_object) {
-        if (!this._element_object[other_element]) {
-          return false;
-        }
-      }
-      for (var this_element in this._element_object) {
-        if (!other_set._element_object[this_element]) {
-          return false;
-        }
-      }
-      return false;
-    }
-    contains(element) {
-      return element in this._element_object;
-    }
-    toArray() {
-      /** returns Array (of strings, usually) */
+    /** Return an unordered Array of strings representing this Set.
+     * [immutable] */
+    toJSON() {
       return Object.keys(this._element_object);
     }
 
-    //static intersect(sets: Array<Set>) {
-    //  var s = new Set();
-    //  sets.forEach(function(set) {
-    //    s._merge(set);
-    //  });
-    //  return s;
-    //}
-    //static subtract(sets) {
-    //}
-    static union(sets: Array<Set>) {
-      /** Immutable. Returns a new set that contains all the elements from the
-       given sets (may be the empty set). */
-      var s = new Set();
-      // sets.forEach(s._merge.bind(s));
-      sets.forEach(function(set) {
-        s._merge(set);
-      });
-      return s;
+    //
+    // mutable methods
+    //
+
+    /** Add a single element to this set.
+     * [mutable, chainable] */
+    _add(element: string) {
+      this._element_object[element] = true;
+      return this;
     }
-    static equal(sets: Array<Set>) {
-      /** Compare an Array of sets, return true if they're all equal.
-       */
-      if (sets.length < 2) return true;
-      // much like the instance.equal version, return on the first mismatch
+    /** Add multiple elements to this set.
+     * [mutable, chainable] */
+    _addArray(elements: string[]) {
+      for (var i = 0, element; (element = elements[i]) !== undefined; i++) {
+        this._element_object[element] = true;
+      }
+      return this;
+    }
+    /** Add all elements from another Set.
+     * [mutable, chainable] */
+    _addSet(other: Set) {
+      for (var element in other._element_object) {
+        this._element_object[element] = true;
+      }
+      return this;
+    }
+    /** Remove a single element from this set. No-op if the element doesn't exist.
+     * [mutable, chainable] */
+    _remove(element: string) {
+      delete this._element_object[element];
+    }
+    /** Remove multiple elements from this set.
+     * [mutable, chainable] */
+    _removeArray(elements: string) {
+      for (var i = 0, element; (element = elements[i]) !== undefined; i++) {
+        delete this._element_object[element];
+      }
+      return this;
+    }
+    /** Remove all elements from another Set.
+     * [mutable, chainable] */
+    _removeSet(other: Set) {
+      for (var element in other._element_object) {
+        delete this._element_object[element];
+      }
+      return this;
+    }
+
+    //
+    // immutable methods
+    //
+
+    /** Return a new Set representing the union of this set and the given
+     * element.
+     * [immutable, chainable] */
+    add(element: string) {
+      return this.clone()._add(element);
+    }
+    /** Return a new Set representing the union of this set and the given
+     * elements.
+     * [immutable, chainable] */
+    addArray(elements: string[]) {
+      return this.clone()._addArray(elements);
+    }
+    /** Return a new Set representing the union of this set and another set.
+     * [immutable, chainable] */
+    addSet(other: Set) {
+      return this.clone()._addSet(other);
+    }
+    /** Return a new Set representing the subtraction of the given element from
+     * this Set.
+     * [immutable, chainable] */
+    remove(element: string) {
+      return this.clone()._remove(element);
+    }
+    /** Return a new Set representing the subtraction of the given elements from
+     * this Set.
+     * [immutable, chainable] */
+    removeArray(elements: string) {
+      return this.clone()._removeArray(elements);
+    }
+    /** Return a new Set representing the subtraction of the given Set from
+     * this Set.
+     * [immutable, chainable] */
+    removeSet(other: Set) {
+      return this.clone()._removeSet(other);
+    }
+
+    //
+    // set analysis
+    //
+
+    /** Pairwise set comparison. Return false at the first mismatch, otherwise
+     * return true.
+     *
+     * new Set([1, 4, 9]).equal(new Set([9, 4, 1])) == true
+     * new Set(['a', 'b', 'z']).equal(new Set(['a', 'b'])) == false
+     * [immutable] */
+    equals(other: Set) {
+      return keysEqual(this._element_object, other._element_object);
+    }
+    /** Check if the given element is contained in this set. */
+    contains(element: string) {
+      return element in this._element_object;
+    }
+    /** Simply . */
+    get size() {
+      // TODO: use an actual property and update it whenever mutating the
+      // underlying _element_object
+      var count = 0;
+      for (var element in this._element_object) {
+        count++;
+      }
+      return count;
+    }
+
+    //
+    // static set operations
+    //
+
+    /** Compare an Array of Sets, returning true if they're all equal.
+     */
+    static equal(sets: Set[]) {
+      if (sets.length == 0) return undefined; // undefined
+      if (sets.length == 1) return true; // trivially true
+      // return on the first mismatch
       var prototype_set = sets[0];
       // use a for loop to allow immediate return
-      for (var i = 1, other_set; (other_set = sets[i]); i++) {
-        if (!prototype_set.equal(other_set)) {
+      for (var i = 1, other; (other = sets[i]) !== undefined; i++) {
+        var prototype_other_equal = keysEqual(prototype_set._element_object, other._element_object);
+        if (!prototype_other_equal) {
           return false;
         }
       }
       return true;
+    }
+    /** Return true if all the given Sets contain the given element.
+     * Returns false on the first mismatch. */
+    static contain(sets: Set[], element: string) {
+      for (var i = 0, set; (set = sets[i]) !== undefined; i++) {
+        if (!(element in set._element_object)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    /** Return a new Set that contains all the elements from the given Sets.
+     * [immutable] */
+    static union(sets: Set[]) {
+      if (sets.length == 0) return undefined; // undefined
+      if (sets.length == 1) return sets[0].clone(); // trivial
+
+      var union_set = new Set([]);
+      for (var i = 0, set; (set = sets[i]) !== undefined; i++) {
+        union_set._addSet(set);
+      }
+      return union_set;
+    }
+
+    /** Return a new Set representing the intersection of all given Sets.
+     * [immutable] */
+    static intersection(sets: Set[]) {
+      if (sets.length == 0) return undefined; // undefined
+      if (sets.length == 1) return sets[0].clone(); // trivial
+
+      // reorder sets from smallest to largest
+      sets = sets.sort(function(a, b) {
+        return a.size - b.size;
+      });
+      var prototype_set = sets[0];
+      var other_sets = sets.slice(1);
+
+      var intersection_set = new Set([]);
+      for (var element in prototype_set._element_object) {
+        var other_sets_contain_element = Set.contain(other_sets, element);
+        if (other_sets_contain_element) {
+          intersection_set._element_object[element] = true;
+        }
+      }
+      return intersection_set;
     }
   }
 }
