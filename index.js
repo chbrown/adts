@@ -1,149 +1,270 @@
-var adts;
-(function (adts) {
-    var Bag = (function () {
-        function Bag(elements) {
-            if (elements === void 0) { elements = []; }
-            this._element_object = {};
-            for (var i = 0, element; (element = elements[i]); i++) {
-                this._element_object[element] = 1;
-            }
+var Bag = (function () {
+    function Bag(elements) {
+        if (elements === void 0) { elements = []; }
+        this._element_object = {};
+        for (var i = 0, element; (element = elements[i]); i++) {
+            this._element_object[element] = 1;
         }
-        return Bag;
-    })();
-    adts.Bag = Bag;
-})(adts || (adts = {}));
-var adts;
-(function (adts) {
-    var Set = (function () {
-        function Set(elements) {
-            if (elements === void 0) { elements = []; }
-            this._element_object = {};
-            for (var i = 0, element; (element = elements[i]); i++) {
-                this._element_object[element] = true;
-            }
-        }
-        // handle overloading constructor without `new` keyword
-        //(elements: Array<string>): Set {
-        //  return new Set(elements);
-        //}
-        //if (!(this instanceof Set)) {
-        //  return new Set(elements);
-        //}
-        //if (elements instanceof Set) {
-        //  // creating a new S from another S will create a copy
-        //  elements = elements.toArray();
-        //}
-        Set.prototype._add = function (element) {
-            /** Mutable. */
-            this._element_object[element] = true;
-        };
-        Set.prototype.add = function (element) {
-            /** Immutable. Returns a new set. */
-            var s = new Set([element]);
-            s._merge(this);
-            return s;
-        };
-        Set.prototype._merge = function (other_set) {
-            for (var element in other_set._element_object) {
-                this._element_object[element] = true;
-            }
-        };
-        Set.prototype._remove = function (element) {
-            /** Mutable. No-op if the element doesn't exist anyway. */
-            delete this._element_object[element];
-        };
-        Set.prototype.equal = function (other_set) {
-            for (var other_element in other_set._element_object) {
-                if (!this._element_object[other_element]) {
-                    return false;
-                }
-            }
-            for (var this_element in this._element_object) {
-                if (!other_set._element_object[this_element]) {
-                    return false;
-                }
-            }
+    }
+    return Bag;
+})();
+exports.Bag = Bag;
+/** Compare two objects and return false as soon as we find a property
+ * not present in both. Otherwise return true. */
+function keysEqual(a, b) {
+    for (var b_element in b) {
+        if (!(b_element in a)) {
             return false;
-        };
-        Set.prototype.contains = function (element) {
-            return element in this._element_object;
-        };
-        Set.prototype.toArray = function () {
-            /** returns Array (of strings, usually) */
-            return Object.keys(this._element_object);
-        };
-        //static intersect(sets: Array<Set>) {
-        //  var s = new Set();
-        //  sets.forEach(function(set) {
-        //    s._merge(set);
-        //  });
-        //  return s;
-        //}
-        //static subtract(sets) {
-        //}
-        Set.union = function (sets) {
-            /** Immutable. Returns a new set that contains all the elements from the
-             given sets (may be the empty set). */
-            var s = new Set();
-            // sets.forEach(s._merge.bind(s));
-            sets.forEach(function (set) {
-                s._merge(set);
-            });
-            return s;
-        };
-        Set.equal = function (sets) {
-            /** Compare an Array of sets, return true if they're all equal.
-             */
-            if (sets.length < 2)
-                return true;
-            // much like the instance.equal version, return on the first mismatch
-            var prototype_set = sets[0];
-            for (var i = 1, other_set; (other_set = sets[i]); i++) {
-                if (!prototype_set.equal(other_set)) {
-                    return false;
-                }
-            }
-            return true;
-        };
-        return Set;
-    })();
-    adts.Set = Set;
-})(adts || (adts = {}));
-var adts;
-(function (adts) {
-    var Stack = (function () {
-        function Stack() {
-            this._array = [];
         }
-        Object.defineProperty(Stack.prototype, "length", {
-            get: function () {
-                return this._array.length;
-            },
-            enumerable: true,
-            configurable: true
+    }
+    for (var a_element in a) {
+        if (!(a_element in b)) {
+            return false;
+        }
+    }
+    return true;
+}
+/**
+new Set(...elements): an abstract data type supporting methods like .add(),
+.merge(), .contains(), and .equals().
+
+Set is implemented by an object with keys that represent elements in the set.
+The values of the object are all boolean true's; the value does not matter,
+only their presence does.
+*/
+var Set = (function () {
+    /** Create a new Set from a plain old Array of strings */
+    function Set(elements) {
+        this._element_object = {};
+        this._addArray(elements);
+    }
+    /** Clone this set, returning the copy.
+     * [immutable] */
+    Set.prototype.clone = function () {
+        var copy = new Set([]);
+        for (var element in this._element_object) {
+            copy._element_object[element] = true;
+        }
+        return copy;
+    };
+    /** Return an unordered Array of strings representing this Set.
+     * [immutable] */
+    Set.prototype.toJSON = function () {
+        return Object.keys(this._element_object);
+    };
+    //
+    // mutable methods
+    //
+    /** Add a single element to this set.
+     * [mutable, chainable] */
+    Set.prototype._add = function (element) {
+        this._element_object[element] = true;
+        return this;
+    };
+    /** Add multiple elements to this set.
+     * [mutable, chainable] */
+    Set.prototype._addArray = function (elements) {
+        for (var i = 0, element; (element = elements[i]) !== undefined; i++) {
+            this._element_object[element] = true;
+        }
+        return this;
+    };
+    /** Add all elements from another Set.
+     * [mutable, chainable] */
+    Set.prototype._addSet = function (other) {
+        for (var element in other._element_object) {
+            this._element_object[element] = true;
+        }
+        return this;
+    };
+    /** Remove a single element from this set. No-op if the element doesn't exist.
+     * [mutable, chainable] */
+    Set.prototype._remove = function (element) {
+        delete this._element_object[element];
+    };
+    /** Remove multiple elements from this set.
+     * [mutable, chainable] */
+    Set.prototype._removeArray = function (elements) {
+        for (var i = 0, element; (element = elements[i]) !== undefined; i++) {
+            delete this._element_object[element];
+        }
+        return this;
+    };
+    /** Remove all elements from another Set.
+     * [mutable, chainable] */
+    Set.prototype._removeSet = function (other) {
+        for (var element in other._element_object) {
+            delete this._element_object[element];
+        }
+        return this;
+    };
+    //
+    // immutable methods
+    //
+    /** Return a new Set representing the union of this set and the given
+     * element.
+     * [immutable, chainable] */
+    Set.prototype.add = function (element) {
+        return this.clone()._add(element);
+    };
+    /** Return a new Set representing the union of this set and the given
+     * elements.
+     * [immutable, chainable] */
+    Set.prototype.addArray = function (elements) {
+        return this.clone()._addArray(elements);
+    };
+    /** Return a new Set representing the union of this set and another set.
+     * [immutable, chainable] */
+    Set.prototype.addSet = function (other) {
+        return this.clone()._addSet(other);
+    };
+    /** Return a new Set representing the subtraction of the given element from
+     * this Set.
+     * [immutable, chainable] */
+    Set.prototype.remove = function (element) {
+        return this.clone()._remove(element);
+    };
+    /** Return a new Set representing the subtraction of the given elements from
+     * this Set.
+     * [immutable, chainable] */
+    Set.prototype.removeArray = function (elements) {
+        return this.clone()._removeArray(elements);
+    };
+    /** Return a new Set representing the subtraction of the given Set from
+     * this Set.
+     * [immutable, chainable] */
+    Set.prototype.removeSet = function (other) {
+        return this.clone()._removeSet(other);
+    };
+    //
+    // set analysis
+    //
+    /** Pairwise set comparison. Return false at the first mismatch, otherwise
+     * return true.
+     *
+     * new Set([1, 4, 9]).equal(new Set([9, 4, 1])) == true
+     * new Set(['a', 'b', 'z']).equal(new Set(['a', 'b'])) == false
+     * [immutable] */
+    Set.prototype.equals = function (other) {
+        return keysEqual(this._element_object, other._element_object);
+    };
+    /** Check if the given element is contained in this set. */
+    Set.prototype.contains = function (element) {
+        return element in this._element_object;
+    };
+    Object.defineProperty(Set.prototype, "size", {
+        /** Simply . */
+        get: function () {
+            // TODO: use an actual property and update it whenever mutating the
+            // underlying _element_object
+            var count = 0;
+            for (var element in this._element_object) {
+                count++;
+            }
+            return count;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    //
+    // static set operations
+    //
+    /** Compare an Array of Sets, returning true if they're all equal.
+     */
+    Set.equal = function (sets) {
+        if (sets.length == 0)
+            return undefined; // undefined
+        if (sets.length == 1)
+            return true; // trivially true
+        // return on the first mismatch
+        var prototype_set = sets[0];
+        for (var i = 1, other; (other = sets[i]) !== undefined; i++) {
+            var prototype_other_equal = keysEqual(prototype_set._element_object, other._element_object);
+            if (!prototype_other_equal) {
+                return false;
+            }
+        }
+        return true;
+    };
+    /** Return true if all the given Sets contain the given element.
+     * Returns false on the first mismatch. */
+    Set.contain = function (sets, element) {
+        for (var i = 0, set; (set = sets[i]) !== undefined; i++) {
+            if (!(element in set._element_object)) {
+                return false;
+            }
+        }
+        return true;
+    };
+    /** Return a new Set that contains all the elements from the given Sets.
+     * [immutable] */
+    Set.union = function (sets) {
+        if (sets.length == 0)
+            return undefined; // undefined
+        if (sets.length == 1)
+            return sets[0].clone(); // trivial
+        var union_set = new Set([]);
+        for (var i = 0, set; (set = sets[i]) !== undefined; i++) {
+            union_set._addSet(set);
+        }
+        return union_set;
+    };
+    /** Return a new Set representing the intersection of all given Sets.
+     * [immutable] */
+    Set.intersection = function (sets) {
+        if (sets.length == 0)
+            return undefined; // undefined
+        if (sets.length == 1)
+            return sets[0].clone(); // trivial
+        // reorder sets from smallest to largest
+        sets = sets.sort(function (a, b) {
+            return a.size - b.size;
         });
-        Stack.prototype.push = function (item) {
-            this._array.push(item);
-        };
-        Stack.prototype.pop = function () {
-            return this._array.pop();
-        };
-        Object.defineProperty(Stack.prototype, "root", {
-            get: function () {
-                return this._array[0];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Stack.prototype, "top", {
-            get: function () {
-                return this._array[this._array.length - 1];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return Stack;
-    })();
-    adts.Stack = Stack;
-})(adts || (adts = {}));
-module.exports = adts;
+        var prototype_set = sets[0];
+        var other_sets = sets.slice(1);
+        var intersection_set = new Set([]);
+        for (var element in prototype_set._element_object) {
+            var other_sets_contain_element = Set.contain(other_sets, element);
+            if (other_sets_contain_element) {
+                intersection_set._element_object[element] = true;
+            }
+        }
+        return intersection_set;
+    };
+    return Set;
+})();
+exports.Set = Set;
+var Stack = (function () {
+    function Stack() {
+        this._array = [];
+    }
+    Object.defineProperty(Stack.prototype, "length", {
+        get: function () {
+            return this._array.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Stack.prototype.push = function (item) {
+        this._array.push(item);
+    };
+    Stack.prototype.pop = function () {
+        return this._array.pop();
+    };
+    Object.defineProperty(Stack.prototype, "root", {
+        get: function () {
+            return this._array[0];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Stack.prototype, "top", {
+        get: function () {
+            return this._array[this._array.length - 1];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Stack;
+})();
+exports.Stack = Stack;
