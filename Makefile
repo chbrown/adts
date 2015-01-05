@@ -1,14 +1,25 @@
-all: index.js adts.d.ts
+# all we really want to end up with is index.js and adts.d.ts
+SHELL := bash
+MODULE := adts
+SOURCES := $(wildcard src/*.ts)
 
-sources := $(wildcard src/*.ts)
+all: index.js $(MODULE).d.ts clean
 
-index.js adts.d.ts: $(sources)
-	# prepare index.js
-	tsc -t ES5 -d --out index.js $(sources)
-	echo 'module.exports = adts;' >> index.js
-	# prepare adts.d.ts
-	sed 's/declare module adts/declare module "adts"/g' index.d.ts > adts.d.ts
-	rm index.d.ts
+index.js: $(SOURCES)
+	tsc --target ES5 --module commonjs $(SOURCES)
+	cat $(+:%.ts=%.js) > $@
 
+tmp:
+	mkdir tmp
+
+$(MODULE).d.ts: $(SOURCES) | tmp
+	cat <(echo 'module $(MODULE) {') $+ <(echo '}') > tmp/module.ts
+	tsc --target ES5 --declaration tmp/module.ts
+	sed 's/declare module \([A-Za-z_]*\)/declare module "\1"/g' tmp/module.d.ts > $@
+
+.PHONY: clean distclean
 clean:
-	rm index.js adts.d.ts
+	rm -rf src/*.js tmp
+
+distclean: clean
+	rm -f index.js $(MODULE).d.ts
