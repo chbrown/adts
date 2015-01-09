@@ -14,18 +14,19 @@ function keysEqual(a: {[index: string]: any}, b: {[index: string]: any}) {
   return true;
 }
 
-/**
-new Set(...elements): an abstract data type supporting methods like .add(),
-.merge(), .contains(), and .equals().
+/** new Set(elements?: string[])
 
-Set is implemented by an object with keys that represent elements in the set.
-The values of the object are all boolean true's; the value does not matter,
-only their presence does.
+Set is an abstract data type supporting methods like .add(), .merge(),
+.contains(), and .equals(). It is implemented by an object with keys that
+represent elements in the set. The values of the object are all boolean true's;
+the value does not matter, only their presence does.
+
+All elements are coerced to strings by object index notation.
 */
 export class Set {
   private _element_object: {[index: string]: boolean};
-  /** Create a new Set from a plain old Array of strings */
-  constructor(elements: string[]) {
+  /** Create a new Set, optionally initializing it with an Array of strings */
+  constructor(elements?: string[]) {
     this._element_object = {};
     this._addArray(elements);
   }

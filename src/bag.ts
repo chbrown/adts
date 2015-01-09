@@ -1,17 +1,12 @@
+/**
+Bag: a multiset; i.e., a Set with counts. The underlying datatype
+is a object, `._element_object`. The effective default of members
+of `._element_object` is 0. Being undefined, having a value of undefined,
+null, false, etc., is all equivalent to having a 0 count.
+
+`Bag()` and `new Bag()` both return an empty bag.
+*/
 export class Bag {
-  /**
-  Bag: a multiset; i.e., a Set with counts. The underlying datatype
-  is a object, `._element_object`. The effective default of members
-  of `._element_object` is 0. Being undefined, having a value of undefined,
-  null, false, etc., is all equivalent to having a 0 count.
-
-  `Bag()` and `new Bag()` both return an empty bag.
-  */
-  // handle overloading constructor without `new` keyword
-  //if (!(this instanceof Bag)) {
-  //  return new Bag(counts);
-  //}
-
   //if (counts instanceof Bag) {
   //  return counts.clone();
   //}
