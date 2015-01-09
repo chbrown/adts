@@ -1,28 +1,29 @@
 declare module "adts" {
+    /**
+    Bag: a multiset; i.e., a Set with counts. The underlying datatype
+    is a object, `._element_object`. The effective default of members
+    of `._element_object` is 0. Being undefined, having a value of undefined,
+    null, false, etc., is all equivalent to having a 0 count.
+    
+    `Bag()` and `new Bag()` both return an empty bag.
+    */
     class Bag {
-        /**
-        Bag: a multiset; i.e., a Set with counts. The underlying datatype
-        is a object, `._element_object`. The effective default of members
-        of `._element_object` is 0. Being undefined, having a value of undefined,
-        null, false, etc., is all equivalent to having a 0 count.
-      
-        `Bag()` and `new Bag()` both return an empty bag.
-        */
         private _element_object;
         constructor(elements?: string[]);
     }
-    /**
-    new Set(...elements): an abstract data type supporting methods like .add(),
-    .merge(), .contains(), and .equals().
+    /** new Set(elements?: string[])
     
-    Set is implemented by an object with keys that represent elements in the set.
-    The values of the object are all boolean true's; the value does not matter,
-    only their presence does.
+    Set is an abstract data type supporting methods like .add(), .merge(),
+    .contains(), and .equals(). It is implemented by an object with keys that
+    represent elements in the set. The values of the object are all boolean true's;
+    the value does not matter, only their presence does.
+    
+    All elements are coerced to strings by object index notation.
     */
     class Set {
         private _element_object;
-        /** Create a new Set from a plain old Array of strings */
-        constructor(elements: string[]);
+        /** Create a new Set, optionally initializing it with an Array of strings */
+        constructor(elements?: string[]);
         /** Clone this set, returning the copy.
          * [immutable] */
         clone(): Set;
@@ -94,15 +95,30 @@ declare module "adts" {
          * [immutable] */
         static intersection(sets: Set[]): Set;
     }
+    /** new Stack<T>(elements?: T[])
+    
+    Basically a simplified Array wrapper, with Stack#bottom and Stack#top getters.
+    
+    When initialized with an Array, the last element in the array will be the top of
+    the Stack. The constructor's elements argment is optional, and defaults to an
+    empty array.
+    */
     class Stack<T> {
-        /** Stack is mostly an impoverished Array wrapper,
-        but with a .top helper */
         private _array;
-        constructor();
+        constructor(elements?: T[]);
+        /** Stack#length
+      
+        Returns size of stack.
+        */
         length: number;
-        push(item: T): void;
+        /** Stack#push(element)
+      
+        Returns size of stack after adding element.
+        */
+        push(element: T): number;
         pop(): T;
-        root: T;
+        bottom: T;
+        peek(): T;
         top: T;
     }
 }
