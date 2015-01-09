@@ -21,6 +21,7 @@
   "license": "MIT",
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
   "devDependencies": {
+    "TypeScript": "*",
     "mocha": "*"
   },
   "scripts": {
