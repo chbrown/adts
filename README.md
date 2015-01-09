@@ -10,6 +10,12 @@ Concerns so far:
 * Everything is packaged up in `index.js`; would that still be a good idea if it was a big project?
 
 
+## Example import
+
+    /// <reference path="../node_modules/adts/adts.d.ts"/>
+    import adts = require('adts');
+
+
 ## TODO
 
 - Container
@@ -31,4 +37,4 @@ Concerns so far:
 
 ## License
 
-Copyright ©2014 Christopher Brown. MIT Licensed.
+Copyright 2014-2015 Christopher Brown. [MIT Licensed](http://opensource.org/licenses/MIT).
