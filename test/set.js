@@ -1,3 +1,4 @@
+/*jslint node: true */ /*globals describe, it */
 var adts = require('../');
 var assert = require('assert');
 
