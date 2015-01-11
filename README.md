@@ -10,10 +10,70 @@ Concerns so far:
 * Everything is packaged up in `index.js`; would that still be a good idea if it was a big project?
 
 
-## Example import
+## Example import configuration
+
+If you have a **plain JavaScript** Node.js project, imports work as usual.
+
+Download the `adts` package from the npm registry:
+
+    npm install --save adts
+
+Then require and use:
+
+    var adts = require('adts');
+
+    var primes = new adts.Set([2, 3, 5, 7, 11, 13, 17, 19, 23]);
+    var even = new adts.Set([2, 4, 6, 8, 10, 12, 14, 16]);
+    var even_primes = adts.Set.intersection([even, primes]);
+    console.log('primes that are even: %j', even_primes);
+    // prints 'primes that are even: ["2"]'
+
+
+If you have a **TypeScript** Node.js project, using [`tsd`](http://definitelytyped.org/tsd/) and [DefinitelyTyped](http://definitelytyped.org/) for most of your dependencies, imports are straightforward, but not idiomatic:
+
+Download the `adts` package from the npm registry.
+
+    npm install --save adts
+
+Assuming `tsd` is using the defaults, the aggregate `d.ts` file will be in `typings/tsd.d.ts`. Open that file, and add the following line:
 
     /// <reference path="../node_modules/adts/adts.d.ts"/>
+
+(The `tsd` documentation states that `tsd link` will handle that, but `tsd link` isn't actually a `tsd` command.)
+
+Now importing the aggregate file will import the `adts` type declarations along with it.
+Suppose you want to use the `adts` module in `index.ts`:
+
+    /// <reference path="typings/tsd.d.ts"/>
     import adts = require('adts');
+
+    var primes = new adts.Set([2, 3, 5, 7, 11, 13, 17, 19, 23]);
+    var even = new adts.Set([2, 4, 6, 8, 10, 12, 14, 16]);
+    var even_primes = adts.Set.intersection([even, primes]);
+    console.log('primes that are even: %j', even_primes);
+
+Now try to compile:
+
+    tsc -m commonjs index.ts
+
+Which produces the error message:
+
+    index.ts(4,27): error TS2345: Argument of type 'number[]' is not assignable to
+      parameter of type 'string[]'. Type 'number' is not assignable to type 'string'.
+    index.ts(5,25): error TS2345: Argument of type 'number[]' is not assignable to
+      parameter of type 'string[]'. Type 'number' is not assignable to type 'string'.
+
+It turns out `adts.Set` only accepts strings in its constructor, since that's how it stores elements internally.
+The plain JS version automatically coerced them to strings, which is fine, but something we need to care about if we're using TypeScript.
+Rewrite the sets like so:
+
+    var primes = new adts.Set(['2', '3', '5', '7', '11', '13', '17', '19', '23']);
+    var even = new adts.Set(['2', '4', '6', '8', '10', '12', '14', '16']);
+
+Now recompile (`tsc -m commonjs index.ts`) and run:
+
+    node index.js
+    // prints 'primes that are even: ["2"]'
 
 
 ## TODO
