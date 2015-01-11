@@ -95,6 +95,36 @@ Now recompile (`tsc -m commonjs index.ts`) and run:
 ... more?
 
 
+## Build notes
+
+TypeScript does not make inter-project modularity easy. Here are some features that I'd like [`tsc`](https://github.com/Microsoft/TypeScript) to support.
+
+1. Generate a `.d.ts` type declaration for use by 3rd-party modules.
+
+  As it stands, I'm not sure what the point of the declaration file is, since if you're generating a declaration file that only allows TypeScript-powered imports, you have to TypeScript-import the original modules as well, which `tsc` is then obliged to compile.
+
+  Fixing this can be pretty simple for a small project: `sed 's/declare module adts/declare module "adts"/g'`
+
+2. Merge module declarations in the generated `.d.ts` file.
+
+  TypeScript (as least v1.1) does not like having multiple external module declarations in one file, e.g., 'module "adts" { ... } module "adts" { } ...'. Otherwise, it's quite happy at merging interfaces and modules, but only reads one external module declaration when there are multiple. (Maybe this is fixed in v1.3?)
+
+3. Export a specific module in the generated `.d.ts` file, and expose that module at root level in the generated `.js` file(s).
+
+  In a typical Node.js module, often the only place the module name shows up is in the `package.json` and documentation. I like using namespaces, but TypeScript's compiler does not use them in a way that plays nice with Node.js's import idioms.
+
+
+### Implementation hacks
+
+The [Makefile](Makefile) demonstrates how I've hacked together support for these features, at least for this admittedly simplistic project.
+
+* All JavaScript code is exported in a single `index.js` file.
+* All type declarations are exported in `adts.d.ts`.
+  This filename is determined by the Makefile, not the project structure or TypeScript namespaces.
+* I can add TypeScripts files to `src/`, and these will automatically get picked up by the make process.
+  (But adding files to subdirectories would require further hacks.)
+
+
 ## License
 
 Copyright 2014-2015 Christopher Brown. [MIT Licensed](http://opensource.org/licenses/MIT).
