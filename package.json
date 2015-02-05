@@ -21,8 +21,8 @@
   "license": "MIT",
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
   "devDependencies": {
-    "TypeScript": "*",
-    "mocha": "*"
+    "TypeScript": "1.3.0",
+    "mocha": "~2.1.0"
   },
   "scripts": {
     "prepublish": "make"
