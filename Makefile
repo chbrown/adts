@@ -15,3 +15,7 @@ adts.d.ts: index.ts | node_modules/.bin/tsc
 	sed 's/declare module adts/declare module "adts"/g' module.d.ts > $@
 	# clean up
 	rm module.{ts,js,d.ts}
+
+.PHONY: test
+test:
+	npm test
