@@ -35,7 +35,7 @@ declare module "adts" {
         _add(element: string): Set;
         /** Add multiple elements to this set.
          * [mutable, chainable] */
-        _addArray(elements: string[]): Set;
+        _addArray(elements?: string[]): Set;
         /** Add all elements from another Set.
          * [mutable, chainable] */
         _addSet(other: Set): Set;

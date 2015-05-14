@@ -73,6 +73,7 @@ var Set = (function () {
     /** Add multiple elements to this set.
      * [mutable, chainable] */
     Set.prototype._addArray = function (elements) {
+        if (elements === void 0) { elements = []; }
         for (var i = 0, element; (element = elements[i]) !== undefined; i++) {
             this._element_object[element] = true;
         }
@@ -187,6 +188,7 @@ var Set = (function () {
             return true; // trivially true
         // return on the first mismatch
         var prototype_set = sets[0];
+        // use a for loop to allow immediate return
         for (var i = 1, other; (other = sets[i]) !== undefined; i++) {
             var prototype_other_equal = keysEqual(prototype_set._element_object, other._element_object);
             if (!prototype_other_equal) {
