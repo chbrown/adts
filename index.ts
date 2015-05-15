@@ -274,43 +274,69 @@ export class Set {
   }
 }
 
-/** new Stack<T>(elements?: T[])
+/**
+A simplified Array wrapper. Differences:
 
-Basically a simplified Array wrapper, with Stack#bottom and Stack#top getters.
+* Provides `top` and `bottom` getters/setters
+* Renames `length` to `size`
 
 When initialized with an Array, the last element in the array will be the top of
 the Stack. The constructor's elements argment is optional, and defaults to an
 empty array.
 */
 export class Stack<T> {
-  private _array: T[];
-  constructor(elements: T[] = []) {
-    this._array = elements;
-  }
-  /** Stack#length
-
-  Returns size of stack.
+  constructor(protected elements: T[] = []) { }
+  /**
+  Return the size (length) of the stack.
   */
-  get length(): number {
-    return this._array.length;
+  get size(): number {
+    return this.elements.length;
   }
-  /** Stack#push(element)
-
-  Returns size of stack after adding element.
+  /**
+  Add a new element to the top of the stack and return the new size of the stack.
   */
   push(element: T): number {
-    return this._array.push(element);
+    return this.elements.push(element);
   }
+  /**
+  Remove the element at the top of the stack and return it.
+
+  Returns undefined if the stack is empty.
+  */
   pop(): T {
-    return this._array.pop();
+    return this.elements.pop();
   }
+  /**
+  Retrieve the bottom element of the stack.
+
+  Returns undefined if the stack is empty.
+  */
   get bottom(): T {
-    return this._array[0];
+    return this.elements[0];
   }
-  peek(): T {
-    return this._array[this._array.length - 1];
+  /**
+  Replace the bottom element of the stack.
+
+  Has the same effect as `Stack#push(element)` if the stack is empty.
+  */
+  set bottom(element: T) {
+    this.elements[0] = element;
   }
+  /**
+  Retrieve the top element of the stack.
+
+  Returns undefined if the stack is empty.
+  */
   get top(): T {
-    return this._array[this._array.length - 1];
+    return this.elements[this.elements.length - 1];
+  }
+  /**
+  Replace the top element of the stack.
+
+  Has the same effect as `Stack#push(element)` if the stack is empty.
+  */
+  set top(element: T) {
+    var index = Math.max(this.elements.length - 1, 0);
+    this.elements[index] = element;
   }
 }
