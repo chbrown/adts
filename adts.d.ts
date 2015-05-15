@@ -109,6 +109,10 @@ declare module "adts" {
         protected elements: T[];
         constructor(elements?: T[]);
         /**
+        Returns the contents of the stack, from bottom to top.
+        */
+        getElements(): T[];
+        /**
         Return the size (length) of the stack.
         */
         size: number;

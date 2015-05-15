@@ -188,6 +188,7 @@ var Set = (function () {
             return true; // trivially true
         // return on the first mismatch
         var prototype_set = sets[0];
+        // use a for loop to allow immediate return
         for (var i = 1, other; (other = sets[i]) !== undefined; i++) {
             var prototype_other_equal = keysEqual(prototype_set._element_object, other._element_object);
             if (!prototype_other_equal) {
@@ -259,6 +260,12 @@ var Stack = (function () {
         if (elements === void 0) { elements = []; }
         this.elements = elements;
     }
+    /**
+    Returns the contents of the stack, from bottom to top.
+    */
+    Stack.prototype.getElements = function () {
+        return this.elements;
+    };
     Object.defineProperty(Stack.prototype, "size", {
         /**
         Return the size (length) of the stack.
