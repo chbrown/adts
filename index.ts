@@ -287,6 +287,12 @@ empty array.
 export class Stack<T> {
   constructor(protected elements: T[] = []) { }
   /**
+  Returns the contents of the stack, from bottom to top.
+  */
+  getElements(): T[] {
+    return this.elements;
+  }
+  /**
   Return the size (length) of the stack.
   */
   get size(): number {
