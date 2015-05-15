@@ -95,30 +95,54 @@ declare module "adts" {
          * [immutable] */
         static intersection(sets: Set[]): Set;
     }
-    /** new Stack<T>(elements?: T[])
+    /**
+    A simplified Array wrapper. Differences:
     
-    Basically a simplified Array wrapper, with Stack#bottom and Stack#top getters.
+    * Provides `top` and `bottom` getters/setters
+    * Renames `length` to `size`
     
     When initialized with an Array, the last element in the array will be the top of
     the Stack. The constructor's elements argment is optional, and defaults to an
     empty array.
     */
     class Stack<T> {
-        private _array;
+        protected elements: T[];
         constructor(elements?: T[]);
-        /** Stack#length
-      
-        Returns size of stack.
+        /**
+        Return the size (length) of the stack.
         */
-        length: number;
-        /** Stack#push(element)
-      
-        Returns size of stack after adding element.
+        size: number;
+        /**
+        Add a new element to the top of the stack and return the new size of the stack.
         */
         push(element: T): number;
+        /**
+        Remove the element at the top of the stack and return it.
+      
+        Returns undefined if the stack is empty.
+        */
         pop(): T;
+        /**
+        Retrieve the bottom element of the stack.
+      
+        Returns undefined if the stack is empty.
+        */
+        /**
+        Replace the bottom element of the stack.
+      
+        Has the same effect as `Stack#push(element)` if the stack is empty.
+        */
         bottom: T;
-        peek(): T;
+        /**
+        Retrieve the top element of the stack.
+      
+        Returns undefined if the stack is empty.
+        */
+        /**
+        Replace the top element of the stack.
+      
+        Has the same effect as `Stack#push(element)` if the stack is empty.
+        */
         top: T;
     }
 }

@@ -188,7 +188,6 @@ var Set = (function () {
             return true; // trivially true
         // return on the first mismatch
         var prototype_set = sets[0];
-        // use a for loop to allow immediate return
         for (var i = 1, other; (other = sets[i]) !== undefined; i++) {
             var prototype_other_equal = keysEqual(prototype_set._element_object, other._element_object);
             if (!prototype_other_equal) {
@@ -245,9 +244,11 @@ var Set = (function () {
     return Set;
 })();
 exports.Set = Set;
-/** new Stack<T>(elements?: T[])
+/**
+A simplified Array wrapper. Differences:
 
-Basically a simplified Array wrapper, with Stack#bottom and Stack#top getters.
+* Provides `top` and `bottom` getters/setters
+* Renames `length` to `size`
 
 When initialized with an Array, the last element in the array will be the top of
 the Stack. The constructor's elements argment is optional, and defaults to an
@@ -256,42 +257,69 @@ empty array.
 var Stack = (function () {
     function Stack(elements) {
         if (elements === void 0) { elements = []; }
-        this._array = elements;
+        this.elements = elements;
     }
-    Object.defineProperty(Stack.prototype, "length", {
-        /** Stack#length
-      
-        Returns size of stack.
+    Object.defineProperty(Stack.prototype, "size", {
+        /**
+        Return the size (length) of the stack.
         */
         get: function () {
-            return this._array.length;
+            return this.elements.length;
         },
         enumerable: true,
         configurable: true
     });
-    /** Stack#push(element)
-  
-    Returns size of stack after adding element.
+    /**
+    Add a new element to the top of the stack and return the new size of the stack.
     */
     Stack.prototype.push = function (element) {
-        return this._array.push(element);
+        return this.elements.push(element);
     };
+    /**
+    Remove the element at the top of the stack and return it.
+  
+    Returns undefined if the stack is empty.
+    */
     Stack.prototype.pop = function () {
-        return this._array.pop();
+        return this.elements.pop();
     };
     Object.defineProperty(Stack.prototype, "bottom", {
+        /**
+        Retrieve the bottom element of the stack.
+      
+        Returns undefined if the stack is empty.
+        */
         get: function () {
-            return this._array[0];
+            return this.elements[0];
+        },
+        /**
+        Replace the bottom element of the stack.
+      
+        Has the same effect as `Stack#push(element)` if the stack is empty.
+        */
+        set: function (element) {
+            this.elements[0] = element;
         },
         enumerable: true,
         configurable: true
     });
-    Stack.prototype.peek = function () {
-        return this._array[this._array.length - 1];
-    };
     Object.defineProperty(Stack.prototype, "top", {
+        /**
+        Retrieve the top element of the stack.
+      
+        Returns undefined if the stack is empty.
+        */
         get: function () {
-            return this._array[this._array.length - 1];
+            return this.elements[this.elements.length - 1];
+        },
+        /**
+        Replace the top element of the stack.
+      
+        Has the same effect as `Stack#push(element)` if the stack is empty.
+        */
+        set: function (element) {
+            var index = Math.max(this.elements.length - 1, 0);
+            this.elements[index] = element;
         },
         enumerable: true,
         configurable: true
