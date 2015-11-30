@@ -1,21 +1,12 @@
-SHELL := bash
+BIN := node_modules/.bin
 
-# all we really want to end up with is index.js and adts.d.ts
-all: index.js adts.d.ts
+all: index.js index.d.ts
 
-node_modules/.bin/tsc:
+$(BIN)/tsc $(BIN)/mocha:
 	npm install
 
-index.js: index.ts | node_modules/.bin/tsc
-	node_modules/.bin/tsc -t ES5 -m commonjs $<
+index.js index.d.ts: index.ts $(BIN)/tsc
+	$(BIN)/tsc -d
 
-adts.d.ts: index.ts | node_modules/.bin/tsc
-	cat <(echo 'module adts {') index.ts <(echo '}') > module.ts
-	node_modules/.bin/tsc -t ES5 -m commonjs -d module.ts
-	sed 's/declare module adts/declare module "adts"/g' module.d.ts > $@
-	# clean up
-	rm module.{ts,js,d.ts}
-
-.PHONY: test
-test:
-	npm test
+test: index.js
+	$(BIN)/mocha --compilers js:babel-core/register tests/
