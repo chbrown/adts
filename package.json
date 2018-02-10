@@ -26,6 +26,7 @@
     "mocha": "^2.3.4"
   },
   "scripts": {
-    "test": "make test"
+    "prepare": "tsc -d",
+    "test": "mocha --compilers js:babel-core/register tests/"
   }
 }
