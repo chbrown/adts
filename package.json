@@ -21,9 +21,9 @@
   "license": "MIT",
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
   "devDependencies": {
-    "babel-core": "^5.0.0",
-    "typescript": "*",
-    "mocha": "*"
+    "babel-core": "^5.8.34",
+    "typescript": "^1.6.2",
+    "mocha": "^2.3.4"
   },
   "scripts": {
     "test": "make test"
